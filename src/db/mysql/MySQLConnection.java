@@ -96,43 +96,45 @@ public class MySQLConnection {
 
 	public Set<Item> getFavoriteItems(String userId) {
 		Set<Item> favoriteItems = new HashSet<>();
-		try {
-			String sql = "SELECT * from items, history WHERE items.item_id = history.item_id AND history.user_id = ?";
-			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setString(1, userId);
-			ResultSet rs = statement.executeQuery();
-			ItemBuilder builder = new ItemBuilder();
+	    try {
+	        String sql = "SELECT * from items, history WHERE items.item_id = history.item_id AND history.user_id = ?";
+	        PreparedStatement statement = conn.prepareStatement(sql);
+	        statement.setString(1, userId);
+	        ResultSet rs = statement.executeQuery();
+	        ItemBuilder builder = new ItemBuilder();
 
-			// Because itemId is unique and given one item id there should
-			// have
-			// only one result returned.
-			if (rs.next()) {
-				builder.setItemId(rs.getString("item_id"));
-				builder.setName(rs.getString("name"));
-				builder.setCity(rs.getString("city"));
-				builder.setState(rs.getString("state"));
-				builder.setCountry(rs.getString("country"));
-				builder.setZipcode(rs.getString("zipcode"));
-				builder.setRating(rs.getDouble("rating"));
-				builder.setAddress(rs.getString("address"));
-				builder.setLatitude(rs.getDouble("latitude"));
-				builder.setLongitude(rs.getDouble("longitude"));
-				builder.setDescription(rs.getString("description"));
-				builder.setSnippet(rs.getString("snippet"));
-				builder.setSnippetUrl(rs.getString("snippet_url"));
-				builder.setImageUrl(rs.getString("image_url"));
-				builder.setUrl(rs.getString("url"));
-			}
-			// Join categories information into builder.
-			// But why we do not join in sql? Because it'll be difficult
-			// to set it in builder.
-			Set<String> categories = getCategories(rs.getString("item_id"));
-			builder.setCategories(categories);
-			favoriteItems.add(builder.build());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return favoriteItems;
+	        // Because itemId is unique and given one item id there should
+	        // have
+	        // only one result returned.
+	        while (rs.next()) {
+	          builder.setItemId(rs.getString("item_id"));
+	          builder.setName(rs.getString("name"));
+	          builder.setCity(rs.getString("city"));
+	          builder.setState(rs.getString("state"));
+	          builder.setCountry(rs.getString("country"));
+	          builder.setZipcode(rs.getString("zipcode"));
+	          builder.setRating(rs.getDouble("rating"));
+	          builder.setAddress(rs.getString("address"));
+	          builder.setLatitude(rs.getDouble("latitude"));
+	          builder.setLongitude(rs.getDouble("longitude"));
+	          builder.setDescription(rs.getString("description"));
+	          builder.setSnippet(rs.getString("snippet"));
+	          builder.setSnippetUrl(rs.getString("snippet_url"));
+	          builder.setImageUrl(rs.getString("image_url"));
+	          builder.setUrl(rs.getString("url"));
+
+	        
+	         // Join categories information into builder.
+	         // But why we do not join in sql? Because it'll be difficult
+	         // to set it in builder.
+	         Set<String> categories = getCategories(rs.getString("item_id"));
+	         builder.setCategories(categories);
+	         favoriteItems.add(builder.build());
+	        }
+	    } catch (SQLException e) {
+	      e.printStackTrace();
+	    }
+	    return favoriteItems;
 	}
 
 	public Set<String> getCategories(String itemId) {
